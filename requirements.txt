@@ -1,0 +1,9 @@
+# image classifier
+Pillow
+
+# attributes scraper
+aiohttp
+nordvpn-switcher
+
+# pretty stuff
+rich
