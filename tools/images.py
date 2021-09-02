@@ -14,7 +14,7 @@ punks_spritesheet_width: range = range(100)
 punks_spritesheet_height: range = range(100)
 
 # Load the punk image as an object
-punks_spritesheet: Image = Image.open("../punks.png")
+punks_spritesheet: Image = Image.open("punks.png")
 
 # Individual punk sprites as images
 punks_sprites: List = list(punks_count)
@@ -35,13 +35,13 @@ for x in punks_spritesheet_width:
         punks_sprites[index] = punks_spritesheet.crop((left, upper, right, lower))
 
 # Create the output directory
-if not os.path.exists("../punks"):
-    os.makedirs("../punks")
+if not os.path.exists("punks"):
+    os.makedirs("punks")
 
 # Save punks to PNG files
 for sprite_index in range(len(punks_sprites)):
     try:
-        outpath = f"../punks/punk{sprite_index}.png"
+        outpath = f"punks/punk{sprite_index}.png"
         punks_sprites[sprite_index].save(outpath, "PNG")
         print(f"Saved Punk #{sprite_index} to {outpath}")
     except AttributeError:
