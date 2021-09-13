@@ -23,7 +23,6 @@ SLOTS: dict = {
         "FRONT_BEARD",
         "FRONT_BEARD_DARK",
         "GOAT",
-        "HALF_SHAVED",
         "HANDLEBARS",
         "LUXURIOUS_BEARD",
         "MUSTACHE",
@@ -48,6 +47,7 @@ SLOTS: dict = {
         "DO_RAG",
         "FEDORA",
         "FRUMPY_HAIR",
+        "HALF_SHAVED",
         "HEADBAND",
         "HOODIE",
         "KNITTED_CAP",
@@ -141,26 +141,24 @@ def generate_solidity_files(json_file_path: str, species: list, attributes: list
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract CryptoPunkTraits {{
+library CryptoPunkTraits {{
     enum Slot {{
 {slots}
     }}
 
     enum Trait {{
-        // Default value
-        NULL,
-
 {traits}
     }}
 
     /**
      * @dev Get the slot of a trait by querying for the trait.
-     * eg. traitToSlot(Trait.VAPE)
+     * eg. traitToSlot[Trait.VAPE]
      */
-    mapping(Trait => Slot) public traitToSlot;
-
-    constructor() {{
+    function traitToSlot(uint256 traitId) external pure returns (uint8) {{
+        Slot[{trait_count}] memory traitsToSlots = [
 {trait_to_slot}
+        ];
+        return uint8(traitsToSlots[traitId]);
     }}
 }}
     """
@@ -199,9 +197,7 @@ contract CryptoPunk {{
             attributes_string += f"        {attribute},\n"
 
         for trait in SLOTS[slot]:
-            trait_to_slot_string += (
-                f"        traitToSlot[Trait.{trait}] = Slot.{slot};\n"
-            )
+            trait_to_slot_string += f"            Slot.{slot}, // {trait}\n"
 
     original_punks_string: str = ""
     with open(json_file_path) as json_file:
@@ -255,7 +251,8 @@ contract CryptoPunk {{
         slots=slots_string_enum[:-2],
         traits=attributes_string[1:-2],
         original_punks="original_punks_string",
-        trait_to_slot=trait_to_slot_string[:-1],
+        trait_to_slot="".join(trait_to_slot_string[:-1].rsplit(",", 1)),
+        trait_count=sum(len(SLOTS[slot]) for slot in SLOTS),
     )
 
     crypto_punk_sol = crypto_punk_sol.format(
